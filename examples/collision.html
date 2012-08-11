@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=1000">
+        <title>Test</title>
+        <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="../src/shim.js"></script>
+        <script type="text/javascript" src="../src/event-emitter.js"></script>
+        <script type="text/javascript" src="../src/vector.js"></script>
+        <script type="text/javascript" src="../src/moving-object.js"></script>
+        <script type="text/javascript" src="../src/interactive-object.js"></script>
+        <script type="text/javascript" src="../src/color.js"></script>
+        <script type="text/javascript" src="../src/ball.js"></script>
+        <script type="text/javascript" src="../src/scene.js"></script>
+        <style type="text/css">
+            body, html{
+                margin: 0;
+            }
+            .ball{
+                background-color: blue;
+                position: absolute;
+                -webkit-transform-origin: 0% 0%;
+            }
+        </style>
+        <script type="text/javascript">
+            $(function(){
+                var scene = new Scene()
+                    , w = window.innerWidth
+                    , h = window.innerHeight
+                    , ball = null
+                
+                ball = scene.add(new Ball({
+                    mass : 100000
+                    , radius : 200
+                    , pos : new Vector(210,220)
+                    , vel : new Vector(-3,-2)
+                }))
+                ball.redraw()
+                $(ball.el).addClass('ball')
+                
+                var prev = new Date()
+                    , now = new Date()
+                    , interval_id = null
+                    , gravity = new Vector(0,1) // kg * ( m / s*2 )
+
+                function step(){
+                    now = new Date()
+                    deltaT = now - prev
+                    prev = now
+                    deltaT = deltaT * 1
+                    scene.step(function(){
+                        //scene.applyForce(gravity)
+                        scene.collision(0.1)
+                        scene.each(function(obj){
+                            scene.constraint(w,h,obj)
+                        })
+                    },deltaT)
+                    // .each(function(obj){
+                    //    obj.redraw()
+                    //})
+                }
+                setInterval(step)
+                ;(function render(){
+                    requestAnimationFrame(function(){
+                        scene.each(function(obj){
+                            obj.redraw()
+                        })
+                        render()
+                    })
+                })()
+                
+            })
+        </script>
+    <body>
+        
+    </body>
+</html>
